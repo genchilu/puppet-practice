@@ -1,0 +1,1 @@
+PUPPET_EXTRA_OPTS=--logdest /var/log/puppetlabs/puppet/puppetd.log

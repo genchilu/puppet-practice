@@ -1,0 +1,30 @@
+Vagrant.configure("2") do |config|
+	config.vm.box = "ubuntu/xenial64"
+	config.vm.hostname = "puppet-agent104"
+	config.vm.network "private_network", ip: "192.168.55.104"
+	config.vm.provider "virtualbox" do |vb|
+		vb.name = "puppt-agent104"
+		vb.memory = "2048"
+	end
+	config.vm.provision "file", source: "./puppet-conf/puppet", destination: "~/puppet"
+	config.vm.provision "file", source: "./puppet-conf/puppet.conf", destination: "~/puppet.conf"
+	config.vm.provision "shell", inline: <<-SHELL
+		sudo echo "192.168.55.102  master.puppet.com" | sudo tee -a /etc/hosts
+		sudo apt-get update
+		sudo apt-get upgrade -y
+		sudo apt-get install sysv-rc-conf chrony -y
+		export LC_ALL=en_US.UTF-8
+		sudo service chrony start
+		sudo ysv-rc-conf chrony on
+		sudo timedatectl set-timezone Asia/Taipei
+		wget https://apt.puppetlabs.com/puppet-release-xenial.deb
+		sudo dpkg -i puppet-release-xenial.deb
+		sudo apt-get update
+		sudo apt-get install puppet-agent
+		sudo mv /home/vagrant/puppet /etc/default/puppet
+		sudo mv /home/vagrant/puppet.conf /etc/puppetlabs/puppet/puppet.conf
+		sudo ln -s /opt/puppetlabs/puppet/bin/puppet /usr/sbin/
+		sudo systemctl start puppet
+		sudo systemctl enable puppet
+	SHELL
+end
