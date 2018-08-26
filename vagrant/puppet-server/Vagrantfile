@@ -30,6 +30,5 @@ Vagrant.configure("2") do |config|
 		sudo systemctl start puppetserver
 		sudo systemctl enable puppetserver
 		sudo ufw disable
-		sudo puppet cert sign agent01.puppet.com
 	SHELL
 end
